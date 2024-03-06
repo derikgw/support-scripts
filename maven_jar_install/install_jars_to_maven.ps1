@@ -14,7 +14,7 @@ foreach ($entry in $logEntries) {
     $jarFileName = Split-Path $entry -Leaf
     # Assuming the format before the version is artifactId and the groupId is constant
     $artifactId = $jarFileName -split "-" | Select-Object -First 1
-    $groupId = "com.example" # Replace with your actual groupId
+    $groupId = "org.soapui" # Replace with your actual groupId
 
     # Try to extract version number from the file name
     $version = if ($jarFileName -match "\d+\.\d+(\.\d+)?") {
@@ -24,15 +24,18 @@ foreach ($entry in $logEntries) {
     }
 
     # Construct the Maven command
-    $mavenCmd = "mvn install:install-file " +
+	$mavenCmd = "cmd /c '" +
+                "mvn install:install-file " +
                 "-Dfile=`"$entry`" " +
                 "-DgroupId=$groupId " +
                 "-DartifactId=$artifactId " +
                 "-Dversion=$version " +
                 "-Dpackaging=jar " +
-                "-DgeneratePom=true"
+                "-DgeneratePom=true" +
+				"'"
 
     Write-Host "Executing: $mavenCmd"
     # Execute the Maven command
     Invoke-Expression $mavenCmd
 }
+# mvn install:install-file -Dfile="C:\Program Files\SmartBear\SoapUI-5.7.2\lib\junit-4.13.1.jar" -DgroupId=org.soapui -DartifactId=junit -Dversion=4.13.1 -Dpackaging=jar -DgeneratePom=true
