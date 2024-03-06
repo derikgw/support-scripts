@@ -9,6 +9,9 @@ $logEntries = @(
     "C:\Program Files\SmartBear\SoapUI-5.7.2\lib\testng-7.3.0.jar"
 )
 
+# Initialize an array to hold the dependency XML snippets
+$dependenciesXml = @()
+
 foreach ($entry in $logEntries) {
     # Extract the JAR file name
     $jarFileName = Split-Path $entry -Leaf
@@ -24,7 +27,7 @@ foreach ($entry in $logEntries) {
     }
 
     # Construct the Maven command
-	$mavenCmd = "cmd /c '" +
+    $mavenCmd = "cmd /c '" +
                 "mvn install:install-file " +
                 "-Dfile=`"$entry`" " +
                 "-DgroupId=$groupId " +
@@ -32,10 +35,27 @@ foreach ($entry in $logEntries) {
                 "-Dversion=$version " +
                 "-Dpackaging=jar " +
                 "-DgeneratePom=true" +
-				"'"
+                "'"
 
     Write-Host "Executing: $mavenCmd"
     # Execute the Maven command
     Invoke-Expression $mavenCmd
+
+    # Add the dependency to the array
+    $dependencyXml = @"
+        <dependency>
+            <groupId>$groupId</groupId>
+            <artifactId>$artifactId</artifactId>
+            <version>$version</version>
+        </dependency>
+"@
+    $dependenciesXml += $dependencyXml
 }
-# mvn install:install-file -Dfile="C:\Program Files\SmartBear\SoapUI-5.7.2\lib\junit-4.13.1.jar" -DgroupId=org.soapui -DartifactId=junit -Dversion=4.13.1 -Dpackaging=jar -DgeneratePom=true
+
+# Combine the dependencies into a single string
+$dependenciesSection = "    <dependencies>`n" + ($dependenciesXml -join "`n`n") + "`n    </dependencies>"
+
+# Output the dependencies XML snippet to a file
+$dependenciesSection | Out-File -FilePath "dependencies.xml"
+
+Write-Host "Wrote dependencies.xml"
