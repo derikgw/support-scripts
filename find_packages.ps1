@@ -22,8 +22,13 @@ foreach ($jarFile in $jarFiles) {
     $jarContents = & "$($env:JAVA_HOME)\bin\jar.exe" -tf $jarFile.FullName | Where-Object { $_ -match $packageName.Replace('.', '/') }
 
     if ($jarContents) {
+        # Print the path of the JAR file
         "Found in $($jarFile.FullName):" | Out-File -FilePath $filePath -Append
-        $jarContents | ForEach-Object { "  $_" | Out-File -FilePath $filePath -Append }
+        foreach ($content in $jarContents) {
+            # Extract and print the package name in package format
+            $packageNameFormat = $content -replace "/", "." -replace "\.class$", ""
+            "    $packageNameFormat" | Out-File -FilePath $filePath -Append
+        }
     }
 }
 
