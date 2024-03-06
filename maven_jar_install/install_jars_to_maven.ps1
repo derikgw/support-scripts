@@ -1,3 +1,6 @@
+# Setting JAVA_HOME temporarily for the session
+$env:JAVA_HOME = "C:\Users\Derik\.jdks\corretto-17.0.10"
+
 # Define the log entries
 $logEntries = @(
     "C:\Program Files\SmartBear\SoapUI-5.7.2\lib\ant-junit-1.10.8.jar",
